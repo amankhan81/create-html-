@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adverbs vs. Adjectives Quiz</title>
+    <style>
+        :root {
+            --primary: #00A8E8;
+            --secondary: #007EA7;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 20pt;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 95vw;
+            height: 90vh;
+            max-width: 1000px;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        header {
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            color: var(--primary);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.4s ease;
+        }
+
+        #quiz-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-btn {
+            background: var(--white);
+            border: 3px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 20pt;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            border-color: var(--primary);
+            background-color: #f0f9ff;
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--danger);
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .option-btn.disabled {
+            cursor: default;
+        }
+
+        #feedback-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .feedback-correct { background-color: #dcfce7; border-left: 8px solid var(--success); }
+        .feedback-wrong { background-color: #fee2e2; border-left: 8px solid var(--danger); }
+
+        #next-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20pt;
+            cursor: pointer;
+            display: none;
+            align-self: flex-end;
+        }
+
+        #results-screen {
+            display: none;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 10px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+        }
+
+        .score-num { font-size: 60pt; font-weight: 800; color: var(--primary); }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20pt;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            align-self: center;
+        }
+
+        .icon { font-weight: bold; font-size: 1.2em; }
+
+        @media (max-width: 768px) {
+            .options-grid { grid-template-columns: 1fr; }
+            #app-container { height: 95vh; padding: 20px; }
+            body { font-size: 16pt; }
+            .option-btn, #next-btn, .restart-btn { font-size: 16pt; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <header>
+            <div class="title">Adjective vs. Adverb Quiz</div>
+            <div id="q-count">1 / 15</div>
+        </header>
+
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <div id="quiz-area">
+            <div id="question-container">
+                <div class="question-text" id="question-text">Loading...</div>
+                <div class="options-grid" id="options-grid"></div>
+                <div id="feedback-area"></div>
+                <button id="next-btn" onclick="goToNext()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <div id="results-screen">
+            <div class="score-circle">
+                <div class="score-num" id="final-score">0</div>
+                <div style="font-size: 0.4em;">/ 15</div>
+            </div>
+            <div id="feedback-title" style="font-size: 1.5em; font-weight: 800; margin-bottom: 10px;"></div>
+            <div id="feedback-msg" style="margin-bottom: 30px; color: #64748b;"></div>
+            <button class="restart-btn" onclick="resetQuiz()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "The teachers in our school are _______.", options: ["enthusiastic", "enthusiastically"], a: 0, exp: "'Enthusiastic' is a predicate adjective that follows the linking verb 'are' to describe the teachers." },
+            { q: "Teachers in our school must work _______.", options: ["hard", "hardly"], a: 0, exp: "'Hard' is an adverb describing the action verb 'work'." },
+            { q: "This movie is _______.", options: ["bad", "badly"], a: 0, exp: "'Bad' is an adjective used after the linking verb 'is'." },
+            { q: "The actors performed _______.", options: ["bad", "badly"], a: 1, exp: "'Badly' is an adverb describing the action verb 'performed'." },
+            { q: "The popcorn is _______.", options: ["good", "well"], a: 0, exp: "'Good' is an adjective used after a linking verb to describe the noun (popcorn)." },
+            { q: "The seats recline _______.", options: ["good", "well"], a: 1, exp: "'Well' is an adverb describing the action verb 'recline'." },
+            { q: "I don't feel very _______.", options: ["good", "well"], a: 1, exp: "When describing a person's health after a linking verb, 'well' is used as an adjective." },
+            { q: "Skating is a _______ workout.", options: ["real", "really"], a: 0, exp: "'Real' is an adjective describing the noun 'workout'." },
+            { q: "Skating is _______ fun.", options: ["real", "really"], a: 1, exp: "'Really' is an adverb describing the adjective 'fun'." },
+            { q: "A skater needs _______ feet.", options: ["sure", "surely"], a: 0, exp: "'Sure' is an adjective describing the noun 'feet'." },
+            { q: "To go fast is _______ the most fun.", options: ["sure", "surely"], a: 1, exp: "'Surely' is an adverb modifying the entire phrase." },
+            { q: "_______ skaters are careful.", options: ["Most", "Almost"], a: 0, exp: "'Most' is an adjective here describing 'skaters'." },
+            { q: "I _______ never fall.", options: ["most", "almost"], a: 1, exp: "'Almost' is an adverb describing the adverb 'never'." },
+            { q: "She is a _______ good singer.", options: ["real", "really"], a: 1, exp: "Use the adverb 'really' to modify the adjective 'good'." },
+            { q: "The team played _______ today.", options: ["good", "well"], a: 1, exp: "'Well' is the adverb form used to describe the action verb 'played'." }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById('question-text').innerText = currentQuestion.q;
+            document.getElementById('q-count').innerText = `${currentQuestionIndex + 1} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
+            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${option}</span><span class="icon"></span>`;
+                btn.onclick = () => handleAnswer(index, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selectedIndex, clickedBtn) {
+            if (answered) return;
+            answered = true;
+
+            const correctIndex = questions[currentQuestionIndex].a;
+            const btns = document.querySelectorAll('.option-btn');
+            const feedbackArea = document.getElementById('feedback-area');
+            
+            btns.forEach(btn => btn.classList.add('disabled'));
+
+            if (selectedIndex === correctIndex) {
+                score++;
+                clickedBtn.classList.add('correct');
+                clickedBtn.querySelector('.icon').innerHTML = '&#10003;'; 
+                feedbackArea.className = 'feedback-correct';
+                feedbackArea.innerHTML = `<strong>Correct!</strong> ${questions[currentQuestionIndex].exp}`;
+            } else {
+                clickedBtn.classList.add('wrong');
+                clickedBtn.querySelector('.icon').innerHTML = '&#10007;'; 
+                btns[correctIndex].classList.add('correct');
+                btns[correctIndex].querySelector('.icon').innerHTML = '&#10003;';
+                feedbackArea.className = 'feedback-wrong';
+                feedbackArea.innerHTML = `<strong>Not quite.</strong> The answer is <em>${questions[currentQuestionIndex].options[correctIndex]}</em>. ${questions[currentQuestionIndex].exp}`;
+            }
+
+            feedbackArea.style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function goToNext() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'flex';
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('final-score').innerText = score;
+
+            const title = document.getElementById('feedback-title');
+            const msg = document.getElementById('feedback-msg');
+
+            if (score === 15) {
+                title.innerText = "Grammar Pro! 🏆";
+                msg.innerText = "You perfectly distinguish between adjectives and adverbs!";
+            } else if (score >= 12) {
+                title.innerText = "Great Job! 🌟";
+                msg.innerText = "You have a solid understanding of linking verbs vs. action verbs.";
+            } else if (score >= 8) {
+                title.innerText = "Nice Effort! 👍";
+                msg.innerText = "Remember: adjectives describe nouns, adverbs describe verbs/adjectives.";
+            } else {
+                title.innerText = "Keep Practicing! 📚";
+                msg.innerText = "Focus on the confusing pairs like real/really and good/well.";
+            }
+        }
+
+        function resetQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            document.getElementById('quiz-area').style.display = 'flex';
+            document.getElementById('results-screen').style.display = 'none';
+            loadQuestion();
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
