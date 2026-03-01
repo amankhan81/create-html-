@@ -3,348 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adjectives & Adverbs Practice</title>
+    <title>Modern Lexicon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00A8E8;
-            --secondary: #007EA7;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --bg: #f8fafc;
-            --text: #1e293b;
-            --white: #ffffff;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-radius: 15px;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            font-size: 20pt;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
+            font-size: 20pt; /* Base font size as requested */
         }
 
-        #app-container {
-            width: 95vw;
-            height: 90vh;
-            max-width: 1000px;
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            padding: 40px;
-            box-sizing: border-box;
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid #334155;
+            height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
         }
 
-        header {
-            border-bottom: 4px solid var(--primary);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .title {
-            color: var(--primary);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            font-size: 1.2em;
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 12px;
-            background: #e2e8f0;
-            border-radius: 6px;
-            margin-bottom: 30px;
-        }
-
-        #progress-bar {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            border-radius: 6px;
-            transition: width 0.4s ease;
-        }
-
-        #quiz-area {
+        .main-content {
             flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 40px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
+            align-items: flex-start;
         }
 
-        .question-text {
-            font-weight: 600;
-            margin-bottom: 30px;
-            line-height: 1.4;
+        .definition-card {
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 50px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border: 1px solid #334155;
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .option-btn {
-            background: var(--white);
-            border: 3px solid #e2e8f0;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 20pt;
+        .word-item {
+            padding: 15px 25px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
         }
 
-        .option-btn:hover:not(.disabled) {
-            border-color: var(--primary);
-            background-color: #f0f9ff;
+        .word-item:hover {
+            background-color: #1e293b;
+            color: var(--text-primary);
         }
 
-        .option-btn.correct {
-            border-color: var(--success);
-            background-color: #dcfce7;
-            color: #166534;
+        .word-item.active {
+            background-color: #1e293b;
+            color: var(--text-primary);
+            border-left-color: currentColor;
         }
 
-        .option-btn.wrong {
-            border-color: var(--danger);
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .option-btn.disabled {
-            cursor: default;
-        }
-
-        #feedback-area {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 12px;
-            display: none;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-
-        .feedback-correct { background-color: #dcfce7; border-left: 8px solid var(--success); }
-        .feedback-wrong { background-color: #fee2e2; border-left: 8px solid var(--danger); }
-
-        #next-btn {
-            margin-top: 20px;
-            padding: 15px 30px;
-            background-color: var(--primary);
-            color: white;
+        .audio-btn {
+            background: rgba(255, 255, 255, 0.05);
             border: none;
-            border-radius: 10px;
-            font-size: 20pt;
-            cursor: pointer;
-            display: none;
-            align-self: flex-end;
-        }
-
-        #results-screen {
-            display: none;
-            text-align: center;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .score-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 10px solid var(--primary);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 30px;
-        }
-
-        .score-num { font-size: 60pt; font-weight: 800; color: var(--primary); }
-
-        .restart-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 20px 40px;
-            font-size: 20pt;
+            padding: 12px;
             border-radius: 12px;
             cursor: pointer;
-            font-weight: 600;
-            align-self: center;
+            transition: all 0.2s;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .icon { font-weight: bold; font-size: 1.2em; }
-
-        @media (max-width: 768px) {
-            .options-grid { grid-template-columns: 1fr; }
-            #app-container { height: 95vh; padding: 20px; }
-            body { font-size: 16pt; }
-            .option-btn, #next-btn, .restart-btn { font-size: 16pt; }
+        .audio-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
         }
+
+        .audio-btn:active {
+            transform: scale(0.95);
+        }
+
+        .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Custom scrollbar for Webkit */
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="flex">
 
-    <div id="app-container">
-        <header>
-            <div class="title">Adverb & Adjective Usage</div>
-            <div id="q-count">1 / 15</div>
-        </header>
-
-        <div class="progress-container">
-            <div id="progress-bar"></div>
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-2xl font-bold tracking-tight text-indigo-400">Lexicon.</h1>
         </div>
-
-        <div id="quiz-area">
-            <div id="question-container">
-                <div class="question-text" id="question-text">Loading...</div>
-                <div class="options-grid" id="options-grid"></div>
-                <div id="feedback-area"></div>
-                <button id="next-btn" onclick="goToNext()">Next Question &rarr;</button>
-            </div>
+        <div id="wordList" class="flex-grow">
+            <!-- Word items will be injected here -->
         </div>
+    </aside>
 
-        <div id="results-screen">
-            <div class="score-circle">
-                <div class="score-num" id="final-score">0</div>
-                <div style="font-size: 0.4em;">/ 15</div>
-            </div>
-            <div id="feedback-title" style="font-size: 1.5em; font-weight: 800; margin-bottom: 10px;"></div>
-            <div id="feedback-msg" style="margin-bottom: 30px; color: #64748b;"></div>
-            <button class="restart-btn" onclick="resetQuiz()">Restart Practice</button>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div id="displayArea" class="w-full flex justify-center">
+            <!-- Definition card will be injected here -->
         </div>
-    </div>
+    </main>
 
     <script>
-        const questions = [
-            { q: "Kari finished the quiz (most quick, _______) of all.", options: ["most quick", "most quickly"], a: 1, exp: "Use 'most quickly' because it is an adverb modifying the action verb 'finished'." },
-            { q: "The baby ducklings (ready, _______) took to the water.", options: ["ready", "readily"], a: 1, exp: "'Readily' is an adverb modifying the action verb 'took'." },
-            { q: "The nurse noticed she didn't look very (good, _______).", options: ["good", "well"], a: 1, exp: "When describing a person's health after a linking verb, 'well' is the correct adjective form." },
-            { q: "Tina wanted very (bad, _______) to make the team.", options: ["bad", "badly"], a: 1, exp: "'Badly' is an adverb modifying the verb 'wanted'." },
-            { q: "Pete was (most, _______) finished with lunch when I arrived.", options: ["most", "almost"], a: 1, exp: "Use 'almost' (meaning 'nearly') as an adverb modifying 'finished'." },
-            { q: "The plan is (_______, possibly) to carry out.", options: ["possible", "possibly"], a: 0, exp: "'Possible' is a predicate adjective following the linking verb 'is'." },
-            { q: "I (sure, _______) will not go there with you!", options: ["sure", "surely"], a: 1, exp: "'Surely' is an adverb used to emphasize the statement." },
-            { q: "The twelfth of November last year was (real, _______) chilly.", options: ["real", "really"], a: 1, exp: "Use the adverb 'really' to modify the adjective 'chilly'." },
-            { q: "Luis tried to look at his chances (realistic, _______).", options: ["realistic", "realistically"], a: 1, exp: "'Realistically' is an adverb describing HOW he looked at his chances." },
-            { q: "Teachers in our school must work _______.", options: ["hard", "hardly"], a: 0, exp: "'Hard' is the correct adverb form to describe intense effort." },
-            { q: "The team played _______ today.", options: ["good", "well"], a: 1, exp: "Use 'well' as an adverb to describe how the team 'played'." },
-            { q: "The movie we saw was actually quite _______.", options: ["bad", "badly"], a: 0, exp: "'Bad' is an adjective following the linking verb 'was'." },
-            { q: "_______ students are careful with their work.", options: ["Most", "Almost"], a: 0, exp: "Use 'Most' as an adjective to modify the noun 'students'." },
-            { q: "The seats in the theater recline _______.", options: ["good", "well"], a: 1, exp: "'Well' is an adverb modifying the action verb 'recline'." },
-            { q: "A skater needs _______ feet to be successful.", options: ["sure", "surely"], a: 0, exp: "Use the adjective 'sure' to describe the noun 'feet'." }
+        const words = [
+            { id: "01", word: "Abound", meaning: "To exist in great numbers or quantities.", sentence: "Freshwater fish abound in these pristine mountain streams.", synonyms: "flourish, teem, overflow", antonyms: "lack, vanish, deficient", color: "#38bdf8" },
+            { id: "02", word: "Braggart", meaning: "A person who boasts about their achievements or possessions.", sentence: "He was such a braggart that no one believed his true accomplishments.", synonyms: "boaster, show-off, swaggerer", antonyms: "modest person, humble soul", color: "#f87171" },
+            { id: "03", word: "Cache", meaning: "A collection of items of the same type stored in a hidden place.", sentence: "The explorers discovered a hidden cache of supplies left by the previous team.", synonyms: "hoard, store, accumulation", antonyms: "exposure, void", color: "#4ade80" },
+            { id: "04", word: "Clarification", meaning: "The action of making a statement or situation more comprehensible.", sentence: "The manager issued a clarification regarding the new office policies.", synonyms: "explanation, elucidation, simplification", antonyms: "confusion, obscuration", color: "#fbbf24" },
+            { id: "05", word: "Despondent", meaning: "In low spirits from loss of hope or courage.", sentence: "After failing the exam for the third time, she felt utterly despondent.", synonyms: "disheartened, discouraged, depressed", antonyms: "cheerful, optimistic, hopeful", color: "#818cf8" },
+            { id: "06", word: "Embezzle", meaning: "Steal or misappropriate money placed in one's trust.", sentence: "The accountant was arrested for trying to embezzle funds from the non-profit.", synonyms: "misappropriate, pilfer, defraud", antonyms: "compensate, give back", color: "#a78bfa" },
+            { id: "07", word: "Heartrending", meaning: "Causing great sadness or distress.", sentence: "The documentary shared a heartrending story of a family separated by war.", synonyms: "distressing, agonizing, tragic", antonyms: "joyful, heartening", color: "#f472b6" },
+            { id: "08", word: "Leisurely", meaning: "Acting or done without hurry; relaxed.", sentence: "They took a leisurely stroll through the park on Sunday afternoon.", synonyms: "relaxed, unhurried, easygoing", antonyms: "rushed, hurried, hectic", color: "#22d3ee" },
+            { id: "09", word: "Lethargic", meaning: "Affected by lethargy; sluggish and apathetic.", sentence: "Hot weather often makes people feel lethargic and unmotivated.", synonyms: "sluggish, listless, inactive", antonyms: "energetic, vigorous, alert", color: "#fb923c" },
+            { id: "10", word: "Malady", meaning: "A disease or ailment.", sentence: "Scientists are working hard to find a cure for this mysterious malady.", synonyms: "illness, sickness, disorder", antonyms: "health, wellness", color: "#38bdf8" },
+            { id: "11", word: "Mellow", meaning: "Pleasantly smooth or soft; free from harshness.", sentence: "The jazz singer had a mellow voice that calmed the entire room.", synonyms: "smooth, relaxed, gentle", antonyms: "harsh, strident, sharp", color: "#a3e635" },
+            { id: "12", word: "Nomadic", meaning: "Living the life of a nomad; wandering.", sentence: "The tribe maintained a nomadic lifestyle, moving with the seasons.", synonyms: "wandering, roaming, itinerant", antonyms: "settled, stationary, fixed", color: "#e879f9" },
+            { id: "13", word: "Piecemeal", meaning: "Characterized by unsystematic partial measures.", sentence: "The renovation was done piecemeal over several years due to budget constraints.", synonyms: "gradual, bit by bit, fragmentary", antonyms: "complete, comprehensive", color: "#2dd4bf" },
+            { id: "14", word: "Quest", meaning: "A long or arduous search for something.", sentence: "The knight began his quest to find the legendary golden chalice.", synonyms: "expedition, search, pursuit", antonyms: "retreat, stagnation", color: "#94a3b8" },
+            { id: "15", word: "Random", meaning: "Made, done, or chosen without method or conscious decision.", sentence: "The computer generated a random sequence of numbers for the experiment.", synonyms: "arbitrary, chance, accidental", antonyms: "planned, systematic, deliberate", color: "#f43f5e" },
+            { id: "16", word: "Rant", meaning: "Speak or shout at length in a wild, impassioned way.", sentence: "The neighbor began to rant about the noise from the construction site.", synonyms: "tirade, outburst, rave", antonyms: "whisper, quietness", color: "#fb923c" },
+            { id: "17", word: "Reinforce", meaning: "Strengthen or support with additional material.", sentence: "Engineers worked to reinforce the bridge after the heavy flooding.", synonyms: "strengthen, fortify, bolster", antonyms: "weaken, undermine", color: "#6366f1" },
+            { id: "18", word: "Seclusion", meaning: "The state of being private and away from other people.", sentence: "The writer preferred the seclusion of her cabin in the woods.", synonyms: "isolation, privacy, solitude", antonyms: "socializing, publicity", color: "#f1f5f9" },
+            { id: "19", word: "Status", meaning: "The relative social or professional standing of someone.", sentence: "He worked hard to improve his social status within the community.", synonyms: "standing, rank, position", antonyms: "insignificance, lowliness", color: "#c084fc" },
+            { id: "20", word: "Turmoil", meaning: "A state of great disturbance, confusion, or uncertainty.", sentence: "The country was in political turmoil following the sudden election results.", synonyms: "confusion, upheaval, chaos", antonyms: "peace, order, calm", color: "#f87171" }
         ];
 
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let answered = false;
+        const wordList = document.getElementById('wordList');
+        const displayArea = document.getElementById('displayArea');
+        let currentWordId = "01";
 
-        function loadQuestion() {
-            answered = false;
-            const currentQuestion = questions[currentQuestionIndex];
-            document.getElementById('question-text').innerText = currentQuestion.q;
-            document.getElementById('q-count').innerText = `${currentQuestionIndex + 1} / ${questions.length}`;
-            document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
-            document.getElementById('feedback-area').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
+        function playSound(id) {
+            const audio = new Audio(`${id}.mp3`);
+            audio.play().catch(e => console.log("Audio file not found: " + id + ".mp3"));
+        }
+
+        function highlightInSentence(sentence, word, color) {
+            const regex = new RegExp(`(${word})`, 'gi');
+            return sentence.replace(regex, `<span style="color: ${color}; font-weight: 600;">$1</span>`);
+        }
+
+        function selectWord(id) {
+            currentWordId = id;
+            const wordData = words.find(w => w.id === id);
             
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-            currentQuestion.options.forEach((option, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = `<span>${option}</span><span class="icon"></span>`;
-                btn.onclick = () => handleAnswer(index, btn);
-                grid.appendChild(btn);
+            // Update sidebar UI
+            document.querySelectorAll('.word-item').forEach(el => {
+                el.classList.remove('active');
+                el.style.color = '';
             });
+            const activeEl = document.querySelector(`[data-id="${id}"]`);
+            activeEl.classList.add('active');
+            activeEl.style.color = wordData.color;
+
+            // Render Card
+            renderCard(wordData);
         }
 
-        function handleAnswer(selectedIndex, clickedBtn) {
-            if (answered) return;
-            answered = true;
-
-            const correctIndex = questions[currentQuestionIndex].a;
-            const btns = document.querySelectorAll('.option-btn');
-            const feedbackArea = document.getElementById('feedback-area');
+        function renderCard(data) {
+            const highlightedSentence = highlightInSentence(data.sentence, data.word, data.color);
             
-            btns.forEach(btn => btn.classList.add('disabled'));
+            displayArea.innerHTML = `
+                <div class="definition-card">
+                    <div class="flex justify-between items-start mb-10">
+                        <div>
+                            <h2 class="text-6xl font-bold mb-2" style="color: ${data.color}">${data.word}</h2>
+                            <p class="text-slate-500 font-mono text-sm uppercase tracking-widest">Entry #${data.id}</p>
+                        </div>
+                        <button onclick="playSound('${data.id}')" class="audio-btn" title="Play Pronunciation">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                        </button>
+                    </div>
 
-            if (selectedIndex === correctIndex) {
-                score++;
-                clickedBtn.classList.add('correct');
-                clickedBtn.querySelector('.icon').innerHTML = '&#10003;'; 
-                feedbackArea.className = 'feedback-correct';
-                feedbackArea.innerHTML = `<strong>Correct!</strong> ${questions[currentQuestionIndex].exp}`;
-            } else {
-                clickedBtn.classList.add('wrong');
-                clickedBtn.querySelector('.icon').innerHTML = '&#10007;'; 
-                btns[correctIndex].classList.add('correct');
-                btns[correctIndex].querySelector('.icon').innerHTML = '&#10003;';
-                feedbackArea.className = 'feedback-wrong';
-                feedbackArea.innerHTML = `<strong>Not quite.</strong> The correct answer is <em>${questions[currentQuestionIndex].options[correctIndex]}</em>. ${questions[currentQuestionIndex].exp}`;
-            }
+                    <div class="space-y-12">
+                        <section>
+                            <span class="label">Definition</span>
+                            <p class="leading-relaxed">${data.meaning}</p>
+                        </section>
 
-            feedbackArea.style.display = 'block';
-            document.getElementById('next-btn').style.display = 'block';
+                        <section>
+                            <span class="label">Usage Example</span>
+                            <p class="italic text-slate-300">"${highlightedSentence}"</p>
+                        </section>
+
+                        <div class="grid grid-cols-2 gap-8 border-t border-slate-700 pt-8">
+                            <section>
+                                <span class="label">Synonyms</span>
+                                <p class="text-lg text-slate-400 font-light">${data.synonyms}</p>
+                            </section>
+                            <section>
+                                <span class="label">Antonyms</span>
+                                <p class="text-lg text-slate-400 font-light">${data.antonyms}</p>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
-        function goToNext() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                loadQuestion();
-            } else {
-                showResults();
-            }
+        function init() {
+            words.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'word-item';
+                div.textContent = item.word;
+                div.setAttribute('data-id', item.id);
+                div.onclick = () => selectWord(item.id);
+                wordList.appendChild(div);
+            });
+
+            // Start with the first word
+            selectWord("01");
         }
 
-        function showResults() {
-            document.getElementById('quiz-area').style.display = 'none';
-            document.getElementById('results-screen').style.display = 'flex';
-            document.getElementById('progress-bar').style.width = '100%';
-            document.getElementById('final-score').innerText = score;
-
-            const title = document.getElementById('feedback-title');
-            const msg = document.getElementById('feedback-msg');
-
-            if (score === 15) {
-                title.innerText = "Grammar Legend! 🏆";
-                msg.innerText = "You have mastered the difference between adjectives and adverbs!";
-            } else if (score >= 12) {
-                title.innerText = "Fantastic Work! 🌟";
-                msg.innerText = "You have a very strong grasp of these tricky modifiers.";
-            } else if (score >= 8) {
-                title.innerText = "Good Job! 👍";
-                msg.innerText = "You understand the basics, but review the 'good/well' and 'almost/most' rules.";
-            } else {
-                title.innerText = "Keep Practicing! 📚";
-                msg.innerText = "Review the provided chart and try the exercise again to improve.";
-            }
-        }
-
-        function resetQuiz() {
-            score = 0;
-            currentQuestionIndex = 0;
-            document.getElementById('quiz-area').style.display = 'flex';
-            document.getElementById('results-screen').style.display = 'none';
-            loadQuestion();
-        }
-
-        window.onload = loadQuestion;
+        init();
     </script>
 </body>
 </html>
